@@ -70,6 +70,7 @@ func New(mchId int64, serialNo, privateKey, publicKey string) *Client {
         SerialNo:   serialNo,
         PrivateKey: privateKey,
         PublicKey:  publicKey,
+        Common:     new(Service),
     }
     pay.Common.Client = pay
 
@@ -152,8 +153,7 @@ func (pay *Client) Do(req *http.Request, v interface{}) (err error) {
 }
 
 func (pay *Client) sign(req *http.Request, timestamp int64, nonce, body string) (signature string, err error) {
-    str := fmt.Sprintf(fmtSign, req.Method, req.URL.Path, timestamp, nonce, body)
-
+    str := fmt.Sprintf(fmtSign, req.Method, req.URL.RequestURI(), timestamp, nonce, body)
     hash := sha256.New()
     hash.Write([]byte(str))
     block, _ := pem.Decode([]byte(pay.PrivateKey))

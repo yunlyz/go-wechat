@@ -23,7 +23,7 @@ type SetCallbackResponse struct {
 }
 
 func (srv *CallbackService) SetCallback(ctx context.Context, req *SetCallbackRequest) (rsp *SetCallbackResponse, err error) {
-    request, err := srv.Client.NewRequest(http.MethodPost, "marketing/srv/callbacks", req)
+    request, err := srv.Client.NewRequest(http.MethodPost, "marketing/favor/callbacks", req)
     if err != nil {
         return
     }

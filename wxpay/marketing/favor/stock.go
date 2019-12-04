@@ -91,7 +91,7 @@ type CreateStockResponse struct {
 // https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/marketing/convention/chapter3_1.shtml
 // 通过此接口可创建代金券批次，包括预充值&免充值类型
 func (srv *StockService) CreateStock(ctx context.Context, stock *Stock) (result *CreateStockResponse, err error) {
-    request, err := srv.Client.NewRequest(http.MethodPost, "marketing/srv/coupon-stocks", stock)
+    request, err := srv.Client.NewRequest(http.MethodPost, "marketing/favor/coupon-stocks", stock)
     if err != nil {
         return
     }
@@ -113,7 +113,7 @@ type ActivateStockResponse struct {
 func (srv *StockService) ActivateStock(ctx context.Context, stockCreatorMchId, stockID string) (
 result *ActivateStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
-    path := fmt.Sprintf("marketing/srv/stocks/%s/start", stockID)
+    path := fmt.Sprintf("marketing/favor/stocks/%s/start", stockID)
     rawurl, err := wxpay.AddOptions(path, opt)
     if err != nil {
         return
@@ -143,7 +143,7 @@ type PauseStockResponse struct {
 // 通过此接口可暂停指定代金券批次。暂停后，该代金券批次暂停发放。
 func (srv *StockService) PauseStock(stockCreatorMchId, stockID string) (result *PauseStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
-    path := fmt.Sprintf("marketing/srv/stocks/%s/pause", stockID)
+    path := fmt.Sprintf("marketing/favor/stocks/%s/pause", stockID)
     rawurl, err := wxpay.AddOptions(path, opt)
     if err != nil {
         return
@@ -168,7 +168,7 @@ func (srv *StockService) PauseStock(stockCreatorMchId, stockID string) (result *
 // 通过此接口可重启指定代金券批次。重启后，该代金券批次可以再次发放。
 func (srv *StockService) RestartStock(stockCreatorMchId, stockID string) (result *PauseStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
-    path := fmt.Sprintf("marketing/srv/stocks/%s/pause", stockID)
+    path := fmt.Sprintf("marketing/favor/stocks/%s/pause", stockID)
     rawurl, err := wxpay.AddOptions(path, opt)
     if err != nil {
         return
@@ -205,7 +205,7 @@ type QueryStocksResponse struct {
 }
 
 func (srv *StockService) QueryStocks(opts *QueryStocksOptions) (result *QueryStocksResponse, err error) {
-    req, err := srv.Client.NewRequest(http.MethodGet, "marketing/srv/stocks", nil)
+    req, err := srv.Client.NewRequest(http.MethodGet, "marketing/favor/stocks", nil)
     if err != nil {
         return
     }
@@ -221,7 +221,7 @@ func (srv *StockService) QueryStocks(opts *QueryStocksOptions) (result *QuerySto
 
 func (srv *StockService) GetStock(stockCreatorMchId, stockID string) (result *Stock, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
-    path := fmt.Sprintf("marketing/srv/stocks/%s", stockID)
+    path := fmt.Sprintf("marketing/favor/stocks/%s", stockID)
     rawurl, err := wxpay.AddOptions(path, opt)
     if err != nil {
         return

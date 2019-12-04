@@ -51,8 +51,8 @@ type CreateCouponRequest struct {
     OutRequestNo      string `json:"out_request_no"`
     Appid             string `json:"appid"`
     StockCreatorMchid string `json:"stock_creator_mchid"`
-    CouponValue       int    `json:"coupon_value"`
-    CouponMinimum     int    `json:"coupon_minimum"`
+    CouponValue       int    `json:"coupon_value,omitempty"`
+    CouponMinimum     int    `json:"coupon_minimum,omitempty"`
 }
 
 type CreateCouponResponse struct {
@@ -62,7 +62,7 @@ type CreateCouponResponse struct {
 }
 
 func (srv *CouponService) Create(ctx context.Context, openid string, req *CreateCouponRequest) (rsp *CreateCouponResponse, err error) {
-    path := fmt.Sprintf("marketing/srv/users/%s/coupons", openid)
+    path := fmt.Sprintf("marketing/favor/users/%s/coupons", openid)
     request, err := srv.Client.NewRequest(http.MethodPost, path, req)
     if err != nil {
         return
@@ -79,7 +79,7 @@ type GetCouponOptions struct {
 }
 
 func (srv *CouponService) Get(ctx context.Context, appid, couponId, openid string) (rsp *Coupon, err error) {
-    path := fmt.Sprintf("marketing/srv/users/%s/coupons/%s", openid, couponId)
+    path := fmt.Sprintf("marketing/favor/users/%s/coupons/%s", openid, couponId)
     rawurl, err := wxpay.AddOptions(path, &GetCouponOptions{Appid: appid})
     if err != nil {
         return
