@@ -24,12 +24,12 @@ import (
 
     "github.com/google/go-querystring/query"
     "github.com/thanhpk/randstr"
-    "github.com/yunlyz/wxpay/marketing/favor"
+    "github.com/yunlyz/go-wechat/wxpay/marketing/favor"
 )
 
 const (
     defaultBaseURL = "https://api.mch.weixin.qq.com/v3/"
-    userAgent      = "go-wxpay"
+    userAgent      = "go-wechat"
 
     defaultMediaType = "application/json"
 
