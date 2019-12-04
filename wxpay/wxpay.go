@@ -24,7 +24,6 @@ import (
 
     "github.com/google/go-querystring/query"
     "github.com/thanhpk/randstr"
-    "github.com/yunlyz/go-wechat/wxpay/marketing/favor"
 )
 
 const (
@@ -44,13 +43,13 @@ const (
 )
 
 type Service struct {
-    Client *WxPay
+    Client *Client
 }
 
-type WxPay struct {
+type Client struct {
     mu     sync.Mutex
     client *http.Client
-    common *Service
+    Common *Service
 
     BaseURL *url.URL
 
@@ -60,10 +59,10 @@ type WxPay struct {
     PublicKey  string
 }
 
-func New(mchId int64, serialNo, privateKey, publicKey string) *WxPay {
+func New(mchId int64, serialNo, privateKey, publicKey string) *Client {
     baseURL, _ := url.Parse(defaultBaseURL)
 
-    pay := &WxPay{
+    pay := &Client{
         mu:         sync.Mutex{},
         client:     &http.Client{},
         BaseURL:    baseURL,
@@ -72,40 +71,12 @@ func New(mchId int64, serialNo, privateKey, publicKey string) *WxPay {
         PrivateKey: privateKey,
         PublicKey:  publicKey,
     }
-    pay.common.Client = pay
+    pay.Common.Client = pay
 
     return pay
 }
 
-func (pay *WxPay) Favor() *favor.Favor {
-    return &favor.Favor{
-        Stock:    (*favor.StockService)(pay.common),
-        Coupon:   (*favor.CouponService)(pay.common),
-        Callback: (*favor.CallbackService)(pay.common),
-    }
-}
-
-func (pay *WxPay) Busifavor() {
-
-}
-
-func (pay *WxPay) MiniProgram() {
-
-}
-
-func (pay *WxPay) PayScore() {
-
-}
-
-func (pay *WxPay) Other() {
-
-}
-
-func (pay *WxPay) Common() {
-
-}
-
-func (pay *WxPay) NewRequest(method, rawurl string, body interface{}) (req *http.Request, err error) {
+func (pay *Client) NewRequest(method, rawurl string, body interface{}) (req *http.Request, err error) {
     if !strings.HasSuffix(pay.BaseURL.Path, "/") {
         return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", pay.BaseURL)
     }
@@ -144,7 +115,7 @@ func (pay *WxPay) NewRequest(method, rawurl string, body interface{}) (req *http
     return
 }
 
-func (pay *WxPay) Do(req *http.Request, v interface{}) (err error) {
+func (pay *Client) Do(req *http.Request, v interface{}) (err error) {
     response, err := pay.client.Do(req)
     if err != nil {
         return
@@ -180,7 +151,7 @@ func (pay *WxPay) Do(req *http.Request, v interface{}) (err error) {
     return
 }
 
-func (pay *WxPay) sign(req *http.Request, timestamp int64, nonce, body string) (signature string, err error) {
+func (pay *Client) sign(req *http.Request, timestamp int64, nonce, body string) (signature string, err error) {
     str := fmt.Sprintf(fmtSign, req.Method, req.URL.Path, timestamp, nonce, body)
 
     hash := sha256.New()
@@ -199,7 +170,7 @@ func (pay *WxPay) sign(req *http.Request, timestamp int64, nonce, body string) (
     return
 }
 
-func (pay *WxPay) verify(header http.Header, body []byte) (err error) {
+func (pay *Client) verify(header http.Header, body []byte) (err error) {
     timestamp := header.Get(headerTimestamp)
     nonce := header.Get(headerNonce)
     signature := header.Get(headerSignature)
@@ -222,7 +193,7 @@ func (pay *WxPay) verify(header http.Header, body []byte) (err error) {
     return rsa.VerifyPKCS1v15(key.(*rsa.PublicKey), crypto.SHA256, hash.Sum(nil), decodeString)
 }
 
-func (pay *WxPay) authorization(timestamp int64, nonce, signature string) string {
+func (pay *Client) authorization(timestamp int64, nonce, signature string) string {
     return fmt.Sprintf(fmtAuth, defaultAuthType, pay.MchId, nonce, signature, timestamp, pay.SerialNo)
 }
 
