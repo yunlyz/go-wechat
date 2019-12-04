@@ -5,7 +5,7 @@ import (
     "net/http"
     "time"
 
-    "github.com/yunlyz/wxpay"
+    "github.com/yunlyz/go-wechat/wxpay"
 )
 
 type CallbackService wxpay.Service
