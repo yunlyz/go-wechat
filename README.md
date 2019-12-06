@@ -1,4 +1,4 @@
-# wxpay
+# go-wechat
 
 全新的微信支付API v3 SDK for golang
 
@@ -12,14 +12,14 @@ SDK for golang 提供 V3 接口分类：
 - [ ] 其他
 - [ ] 通用接口
 
-## 安装
+## install
 ```shell
-$ go get -u github.com/yunlyz/wxpay
+$ go get -u github.com/yunlyz/go-wechat
 ```
 
 ## go module
 ```text
-require github.com/yunlyz/wxpay latest
+require github.com/yunlyz/go-wechat latest
 ```
 
 ## Demo
