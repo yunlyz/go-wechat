@@ -6,13 +6,16 @@ import (
     "net/http"
     "time"
 
-    "github.com/yunlyz/go-wechat/wxpay"
+    "github.com/yunlyz/go-wechat/goutil"
+    "github.com/yunlyz/go-wechat/wxpay/client"
 )
 
-type CouponService wxpay.Service
+type CouponService client.Service
 
 // Coupon represent a wechat pay coupon
 type Coupon struct {
+    Code              string `json:"code,omitempty"`
+    Message           string `json:"message,omitempty"`
     StockCreatorMchid string `json:"stock_creator_mchid"`
     StockID           string `json:"stock_id"`
     CouponID          string `json:"coupon_id"`
@@ -46,6 +49,10 @@ type Coupon struct {
     } `json:"consume_information"`
 }
 
+func (coupon *Coupon) String() string {
+    return goutil.Jsonify(coupon)
+}
+
 type CreateCouponRequest struct {
     StockID           string `json:"stock_id"`
     OutRequestNo      string `json:"out_request_no"`
@@ -56,7 +63,7 @@ type CreateCouponRequest struct {
 }
 
 type CreateCouponResponse struct {
-    wxpay.ErrorMessage
+    client.ErrorMessage
     CouponID string `json:"coupon_id"`
     TraceNo  string `json:"trace_no"`
 }
@@ -80,7 +87,7 @@ type GetCouponOptions struct {
 
 func (srv *CouponService) Get(ctx context.Context, appid, couponId, openid string) (rsp *Coupon, err error) {
     path := fmt.Sprintf("marketing/favor/users/%s/coupons/%s", openid, couponId)
-    rawurl, err := wxpay.AddOptions(path, &GetCouponOptions{Appid: appid})
+    rawurl, err := client.AddOptions(path, &GetCouponOptions{Appid: appid})
     if err != nil {
         return
     }

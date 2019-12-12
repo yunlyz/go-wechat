@@ -5,15 +5,15 @@ import (
     "net/http"
     "time"
 
-    "github.com/yunlyz/go-wechat/wxpay"
+    "github.com/yunlyz/go-wechat/wxpay/client"
 )
 
-type CallbackService wxpay.Service
+type CallbackService client.Service
 
 type SetCallbackRequest struct {
     Mchid     string `json:"mchid"`
     NotifyURL string `json:"notify_url"`
-    Switch    bool   `json:"switch"`
+    Switch    bool   `json:"switch,omitempty"`
 }
 
 type SetCallbackResponse struct {

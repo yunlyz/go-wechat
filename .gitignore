@@ -13,3 +13,6 @@
 
 # Dir of golang .idea
 .idea
+
+# proj
+wxpay/wxpay_test.go

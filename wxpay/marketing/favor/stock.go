@@ -6,13 +6,16 @@ import (
     "net/http"
     "time"
 
-    "github.com/yunlyz/go-wechat/wxpay"
+    "github.com/yunlyz/go-wechat/goutil"
+    "github.com/yunlyz/go-wechat/wxpay/client"
 )
 
-type StockService wxpay.Service
+type StockService client.Service
 
 // Stock represents a Wechat merchant stock
 type Stock struct {
+    Code               string    `json:"code,omitempty"`
+    Message            string    `json:"message,omitempty"`
     StockId            string    `json:"stock_id"`
     StockName          string    `json:"stock_name"`
     Comment            string    `json:"comment"`
@@ -20,41 +23,41 @@ type Stock struct {
     AvailableBeginTime time.Time `json:"available_begin_time"`
     AvailableEndTime   time.Time `json:"available_end_time"`
     DistributedCoupons int64     `json:"distributed_coupons"`
-    StockUseRule       struct {
+    StockUseRule       *struct {
         MaxCoupons         int  `json:"max_coupons"`
         MaxAmount          int  `json:"max_amount"`
         MaxAmountByDay     int  `json:"max_amount_by_day"`
         MaxCouponsPerUser  int  `json:"max_coupons_per_user"`
         NaturalPersonLimit bool `json:"natural_person_limit"`
         PreventAPIAbuse    bool `json:"prevent_api_abuse"`
-    } `json:" stock_use_rule"`
-    PatternInfo struct {
+    } `json:"stock_use_rule"`
+    PatternInfo *struct {
         Description     string `json:"description"`
         MerchantLogo    string `json:"merchant_logo"`
         MerchantName    string `json:"merchant_name"`
-        BackgroundColor string `json:" background_color"`
-        CouponImage     string `json:" coupon_image "`
+        BackgroundColor string `json:"background_color"`
+        CouponImage     string `json:"coupon_image "`
     } `json:"pattern_info"`
-    CouponUseRule struct {
-        CouponAvailableTime struct {
-            FixAvailableTime struct {
-                AvailableWeekDay []int `json:" available_week_day "`
-                BeginTime        int   `json:" begin_time "`
-                EndTime          int   `json:" end_time "`
+    CouponUseRule *struct {
+        CouponAvailableTime *struct {
+            FixAvailableTime *struct {
+                AvailableWeekDay []int `json:"available_week_day "`
+                BeginTime        int   `json:"begin_time "`
+                EndTime          int   `json:"end_time "`
             } `json:"fix_available_time"`
             SecondDayAvailable        bool `json:"second_day_available"`
             AvailableTimeAfterReceive int  `json:"available_time_after_receive"`
         } `json:"coupon_available_time"`
-        FixedNormalCoupon struct {
-            CouponAmount       int `json:" coupon_amount"`
+        FixedNormalCoupon *struct {
+            CouponAmount       int `json:"coupon_amount"`
             TransactionMinimum int `json:"transaction_minimum"`
         } `json:" fixed_normal_coupon "`
-        DisscountCoupon struct {
+        DisscountCoupon *struct {
             DiscountAmountMax  int `json:"discount_amount_max"`
             DiscountPercent    int `json:"discount_percent"`
             TransactionMinimum int `json:"transaction_minimum"`
         } `json:"disscount_coupon"`
-        ExchangeCoupon struct {
+        ExchangeCoupon *struct {
             SinglePriceMax int `json:"single_price_max"`
             ExchangePrice  int `json:"exchange_price"`
         } `json:"exchange_coupon"`
@@ -68,13 +71,17 @@ type Stock struct {
     NoCash       bool      `json:"no_cash"`
     StartTime    time.Time `json:"start_time"`
     StopTime     time.Time `json:"stop_time"`
-    CutToMessage struct {
+    CutToMessage *struct {
         SinglePriceMax int64 `json:"single_price_max"`
         CutToPrice     int64 `json:"cut_to_price"`
     } `json:"cut_to_message"`
     Singleitem   bool   `json:"singleitem"`
     StockType    string `json:"stock_type"`
     OutRequestNo string `json:"out_request_no"`
+}
+
+func (stock *Stock) String() string {
+    return goutil.Jsonify(stock)
 }
 
 type CreatorMchOptions struct {
@@ -84,7 +91,7 @@ type CreatorMchOptions struct {
 type CreateStockResponse struct {
     StockID    string    `json:"stock_id"`
     CreateTime time.Time `json:"create_time"`
-    wxpay.ErrorMessage
+    client.ErrorMessage
 }
 
 // CreateStock-创建代金券批次
@@ -114,7 +121,7 @@ func (srv *StockService) ActivateStock(ctx context.Context, stockCreatorMchId, s
 result *ActivateStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
     path := fmt.Sprintf("marketing/favor/stocks/%s/start", stockID)
-    rawurl, err := wxpay.AddOptions(path, opt)
+    rawurl, err := client.AddOptions(path, opt)
     if err != nil {
         return
     }
@@ -144,7 +151,7 @@ type PauseStockResponse struct {
 func (srv *StockService) PauseStock(stockCreatorMchId, stockID string) (result *PauseStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
     path := fmt.Sprintf("marketing/favor/stocks/%s/pause", stockID)
-    rawurl, err := wxpay.AddOptions(path, opt)
+    rawurl, err := client.AddOptions(path, opt)
     if err != nil {
         return
     }
@@ -169,7 +176,7 @@ func (srv *StockService) PauseStock(stockCreatorMchId, stockID string) (result *
 func (srv *StockService) RestartStock(stockCreatorMchId, stockID string) (result *PauseStockResponse, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
     path := fmt.Sprintf("marketing/favor/stocks/%s/pause", stockID)
-    rawurl, err := wxpay.AddOptions(path, opt)
+    rawurl, err := client.AddOptions(path, opt)
     if err != nil {
         return
     }
@@ -222,7 +229,7 @@ func (srv *StockService) QueryStocks(opts *QueryStocksOptions) (result *QuerySto
 func (srv *StockService) GetStock(stockCreatorMchId, stockID string) (result *Stock, err error) {
     opt := &CreatorMchOptions{StockCreatorMchid: stockCreatorMchId}
     path := fmt.Sprintf("marketing/favor/stocks/%s", stockID)
-    rawurl, err := wxpay.AddOptions(path, opt)
+    rawurl, err := client.AddOptions(path, opt)
     if err != nil {
         return
     }
